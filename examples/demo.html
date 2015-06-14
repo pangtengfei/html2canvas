@@ -171,10 +171,58 @@
     <p style="color: black; font-size: 1em; line-height: 1.3em; clear: both">
       This is a nonsensical document, but syntactically valid HTML 4.0. All 100% conformant CSS1 agents should be able to render the document elements above this paragraph <b>indistinguishably</b> (to the pixel) from this reference rendering, (except font rasterization and form widgets). All discrepancies should be traceable to CSS1 implementation shortcomings. Once you have finished evaluating this test, you can return to the <A HREF="sec5526c.htm" style="text-decoration:none">parent page</A>.
     </p>
+    <canvas id="myCanvas" width="578" height="200"></canvas>
+    <script>
+      var canvas = document.getElementById('myCanvas');
+      var context = canvas.getContext('2d');
+
+      context.beginPath();
+      context.moveTo(100, 150);
+      context.lineTo(450, 50);
+      context.stroke();
+    </script>
     <script type="text/javascript" src="../dist/html2canvas.js"></script>
     <script type="text/javascript">
         html2canvas(document.body).then(function(canvas) {
             document.body.appendChild(canvas);
+            // 图片导出为 png 格式
+            var type = 'png';
+            var imgData = canvas.toDataURL(type);
+
+            /**
+             * 获取mimeType
+             * @param  {String} type the old mime-type
+             * @return the new mime-type
+             */
+            var _fixType = function(type) {
+                type = type.toLowerCase().replace(/jpg/i, 'jpeg');
+                var r = type.match(/png|jpeg|bmp|gif/)[0];
+                return 'image/' + r;
+            };
+               
+            // 加工image data，替换mime type
+            imgData = imgData.replace(_fixType(type),'image/octet-stream');
+
+            /**
+             * 在本地进行文件保存
+             * @param  {String} data     要保存到本地的图片数据
+             * @param  {String} filename 文件名
+             */
+            var saveFile = function(data, filename){
+                var save_link = document.createElementNS('http://www.w3.org/1999/xhtml', 'a');
+                save_link.href = data;
+                save_link.download = filename;
+               
+                var event = document.createEvent('MouseEvents');
+                event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                save_link.dispatchEvent(event);
+            };
+               
+            // 下载后的问题名
+            var filename = 'baidufe_' + (new Date()).getTime() + '.' + type;
+            // download
+            saveFile(imgData,filename);
+
         });
     </script>
   </body>
